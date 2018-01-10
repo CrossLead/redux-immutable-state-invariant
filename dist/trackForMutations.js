@@ -67,6 +67,8 @@ function _detectMutations(isImmutable) {
   }
 
   for (var _key2 in keysToDetect) {
+    if (!hasOwnProp(keysToDetect, _key2)) continue;
+
     var childPath = path.concat(_key2);
     if (ignore.length && ignore.indexOf(childPath.join('.')) !== -1) {
       continue;
