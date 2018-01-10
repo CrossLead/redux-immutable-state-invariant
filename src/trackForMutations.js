@@ -57,6 +57,8 @@ function detectMutations(isImmutable, ignore = [], trackedProperty, obj, samePar
   }
 
   for (const key in keysToDetect) {
+    if (!hasOwnProp(keysToDetect, key)) continue;
+
     const childPath = path.concat(key);
     if (ignore.length && ignore.indexOf(childPath.join('.')) !== -1) {
       continue;
