@@ -30,9 +30,11 @@ function trackProperties(isImmutable, ignore = [], obj, path = []) {
   return tracked;
 }
 
+const hasOwnProp = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
+
+
 function detectMutations(isImmutable, ignore = [], trackedProperty, obj, sameParentRef = false, path = []) {
   const prevObj = trackedProperty ? trackedProperty.value : undefined;
-
   const sameRef = prevObj === obj;
 
   if (sameParentRef && !sameRef && !Number.isNaN(obj)) {
@@ -43,18 +45,18 @@ function detectMutations(isImmutable, ignore = [], trackedProperty, obj, samePar
     return { wasMutated: false };
   }
 
+  const trackedChildren = trackedProperty.children;
+
   // Gather all keys from prev (tracked) and after objs
   const keysToDetect = {};
-  Object.keys(trackedProperty.children).forEach(key => {
-    keysToDetect[key] = true;
-  });
-  Object.keys(obj).forEach(key => {
-    keysToDetect[key] = true;
-  });
+  for (const key in trackedChildren) {
+    if (hasOwnProp(trackedChildren, key)) keysToDetect[key] = true;
+  }
+  for (const key in obj) {
+    if (hasOwnProp(obj, key)) keysToDetect[key] = true;
+  }
 
-  const keys = Object.keys(keysToDetect);
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
+  for (const key in keysToDetect) {
     const childPath = path.concat(key);
     if (ignore.length && ignore.indexOf(childPath.join('.')) !== -1) {
       continue;
@@ -63,7 +65,7 @@ function detectMutations(isImmutable, ignore = [], trackedProperty, obj, samePar
     const result = detectMutations(
       isImmutable,
       ignore,
-      trackedProperty.children[key],
+      trackedChildren[key],
       obj[key],
       sameRef,
       childPath
