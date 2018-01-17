@@ -33,6 +33,8 @@ function trackProperties(isImmutable, ignore = [], obj, path = []) {
 const hasOwnProp = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
 
 
+const TYRANID_HISTORY_PROP = /_history/g;
+
 function detectMutations(isImmutable, ignore = [], trackedProperty, obj, sameParentRef = false, path = []) {
   const prevObj = trackedProperty ? trackedProperty.value : undefined;
   const sameRef = prevObj === obj;
@@ -57,7 +59,7 @@ function detectMutations(isImmutable, ignore = [], trackedProperty, obj, samePar
   }
 
   for (const key in keysToDetect) {
-    if (!hasOwnProp(keysToDetect, key)) continue;
+    if (!hasOwnProp(keysToDetect, key) || TYRANID_HISTORY_PROP.test(key)) continue;
 
     const childPath = path.concat(key);
     if (ignore.length && ignore.indexOf(childPath.join('.')) !== -1) {
