@@ -37,6 +37,8 @@ function trackProperties(isImmutable) {
 
 var hasOwnProp = Object.prototype.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty);
 
+var TYRANID_HISTORY_PROP = /_history/g;
+
 function _detectMutations(isImmutable) {
   var ignore = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
   var trackedProperty = arguments[2];
@@ -67,7 +69,7 @@ function _detectMutations(isImmutable) {
   }
 
   for (var _key2 in keysToDetect) {
-    if (!hasOwnProp(keysToDetect, _key2)) continue;
+    if (!hasOwnProp(keysToDetect, _key2) || TYRANID_HISTORY_PROP.test(_key2)) continue;
 
     var childPath = path.concat(_key2);
     if (ignore.length && ignore.indexOf(childPath.join('.')) !== -1) {
